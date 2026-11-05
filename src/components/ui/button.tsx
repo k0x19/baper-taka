@@ -8,13 +8,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-brand-800',
-        outline: 'border border-border bg-card text-foreground hover:bg-muted',
+        default: 'bg-primary text-primary-foreground hover:bg-brand-800 hover:text-brand-50',
+        outline: 'border border-border bg-card text-foreground hover:bg-muted hover:text-brand-700',
         ghost: 'text-muted-foreground hover:bg-muted hover:text-foreground',
+        brand: 'bg-brand-700 text-brand-50 hover:bg-brand-800 hover:text-brand-100',
+        accent: 'bg-brand-200 text-brand-900 hover:bg-brand-100 hover:text-brand-900',
       },
       size: {
         default: 'h-10 px-4 py-2',
         sm: 'h-8 px-3 text-xs',
+        lg: 'h-12 px-6 text-base',
         icon: 'h-10 w-10',
       },
     },
@@ -28,7 +31,7 @@ const buttonVariants = cva(
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonVariants>;
 
-/** Minimal shadcn/ui-compatible button; more primitives will be added as needed. */
+/** Baper Taka Brand Button */
 export function Button({ className, variant, size, type = 'button', ...props }: ButtonProps) {
   return (
     <button type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />

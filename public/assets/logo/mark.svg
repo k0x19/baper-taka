@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Deep Navy Circle Background -->
+  <circle cx="100" cy="100" r="90" fill="#172554" />
+  <!-- Warm Amber Stylized Taka Symbol (৳) abstraction -->
+  <path d="M50 100 Q100 50 150 100 Q100 150 50 100 Z" fill="#FACC15" opacity="0.9" />
+  <!-- Inner Navy Mark -->
+  <path d="M80 80 L120 120 M120 80 L80 120" stroke="#0F172A" stroke-width="8" stroke-linecap="round" />
+  <!-- Bangla Character abstraction (ব) -->
+  <path d="M70 70 C80 50 120 50 130 70 C120 90 80 90 70 70 Z" fill="#172554" />
+</svg>

@@ -1,7 +1,7 @@
 # Project Blueprint — বাপের টাকা (Baper Taka)
 
-**Status:** Phase 01 (Foundation & Setup) only. This document describes the
-intended product and architecture; sections marked _planned_ are not built yet.
+**Status:** Phase 02 (Branding & Design System) implemented. Phase 01 foundation preserved.  
+**Date:** 2026-11-05  
 
 ## 1. Vision and goals
 
@@ -77,11 +77,24 @@ Supabase
 Motion is installed for future justified animation work but is intentionally
 unused in Phase 01. Playwright is deferred until real journeys exist.
 
-## 5. Planned modules (not implemented)
+## 5. Phase 02 Branding & Design System (implemented)
+
+- **Brand Identity:** Deep Navy (#172554) & Warm Amber (#FACC15) palette
+- **Logo Assets:** SVG mark (`public/assets/logo/mark.svg`) & lockup (`public/assets/logo/lockup.svg`)
+- **Typography:** Bilingual system (Noto Sans Bengali, Hind Siliguri, Inter)
+- **Design Tokens:** CSS variables in `src/styles/globals.css`
+- **Reusable Components:** Button, Input, Textarea, Select, Checkbox, Radio,
+  Badge, Card, Dialog, Dropdown, Separator, Skeleton, Alert, Container
+- **Layout:** Header, Footer, Navigation (integrated into `RootLayout`)
+- **Preview Route:** `/design-system` (`src/features/design-system/`)
+- **Documentation:** `docs/DESIGN_SYSTEM.md`
+- **Quality:** `npm run check` passed (Typecheck, Lint, Format, Test, Build)
+
+## 6. Planned modules (not implemented yet)
 
 | Module            | Responsibility                                            | Depends on      |
 | ----------------- | --------------------------------------------------------- | --------------- |
-| Schema + RLS      | Tables, constraints, policies, privileged functions       | Phase 02        |
+| Schema + RLS      | Tables, constraints, policies, privileged functions       | Phase 03        |
 | Auth + profiles   | Supabase Auth, customer profile, protected admin identity | Schema          |
 | Catalog + Storage | Categories, products, images, inventory display           | Schema, Storage |
 | Cart              | Client cart + server-validated item data                  | Catalog         |
@@ -91,18 +104,18 @@ unused in Phase 01. Playwright is deferred until real journeys exist.
 | Admin dashboard   | Protected CRUD, verification queue, audit views           | RLS, Auth       |
 | Observability     | Error reporting, structured audit logs                    | Later           |
 
-## 6. Quality and delivery
+## 7. Quality and delivery
 
 - Every phase runs `npm run check` (typecheck, lint, Prettier, tests, build).
 - Every phase updates `docs/DEVELOPMENT_LOG.md` and opens a PR for review;
   agents do not merge PRs.
-- Cloudflare Pages deployment happens only after explicit approval; Phase 01
+- Cloudflare Pages deployment happens only after explicit approval; Phase 01/02
   does not deploy.
 - Database migrations, policies and API contracts are documented before they
   are implemented (see `DATABASE_SCHEMA.md`, `SECURITY_POLICY.md`,
   `API_DOCUMENTATION.md`).
 
-## 7. Key decisions and trade-offs
+## 8. Key decisions and trade-offs
 
 - **Supabase over a custom backend:** RLS, Auth and Storage remove the need to
   operate a server while keeping authorization close to the data.
@@ -112,3 +125,5 @@ unused in Phase 01. Playwright is deferred until real journeys exist.
   service or paid dependency is needed.
 - **Manual payments first:** avoids gateway fees and integration risk, at the
   cost of an admin verification step that must be tightly secured.
+- **Design System:** Phase 02 establishes branding, tokens, components and
+  preview route without breaking Phase 01 foundation.

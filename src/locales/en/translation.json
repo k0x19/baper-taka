@@ -2,10 +2,19 @@
   "brand": {
     "name": "বাপের টাকা",
     "nameEn": "Baper Taka",
-    "tagline": "A dependable single-vendor e-commerce platform for Bangladesh"
+    "tagline": "Bangladesh's dependable single-vendor e-commerce platform",
+    "designSystem": {
+      "title": "Design System Preview",
+      "description": "Baper Taka (বাপের টাকা) — Brand identity, colors, typography, and components preview.",
+      "brand": "Brand Identity & Colors",
+      "typography": "Typography System",
+      "components": "Reusable Components",
+      "loading": "Loading States"
+    }
   },
   "nav": {
-    "language": "Select language"
+    "language": "Select language",
+    "designSystem": "Design System"
   },
   "language": {
     "bn": "বাংলা",
@@ -53,14 +62,14 @@
     "errorTitle": "Something went wrong",
     "errorDescription": "This page could not be loaded. Try again or return to the home page.",
     "retry": "Try again",
-    "goHome": "Back to home",
+    "goHome": "Go home",
     "notFoundCode": "404",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The address you are looking for has not been created yet."
   },
   "layout": {
     "skipLink": "Skip to main content",
-    "footer": "© {{year}} Baper Taka · Phase 01: Foundation & Setup",
+    "footer": "© {{year}} Baper Taka · Phase 02: Branding & Design System",
     "footerMeta": "Bangladesh · bn / en · ৳ BDT"
   }
 }

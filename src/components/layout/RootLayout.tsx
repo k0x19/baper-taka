@@ -1,52 +1,61 @@
-import { ShieldCheck } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet } from 'react-router';
+import { Link } from 'react-router';
+import { Button } from '@/components/ui/button';
 
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
-
-export function RootLayout() {
+export function Header() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <a
-        href="#main-content"
-        className="sr-only rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
-      >
-        {t('layout.skipLink')}
-      </a>
-
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-3 rounded-md">
-            <img src="/favicon.svg" alt="" width={40} height={40} className="h-10 w-10" />
-            <span className="flex flex-col">
-              <span className="text-lg font-semibold leading-tight">{t('brand.name')}</span>
-              <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {t('brand.nameEn')}
-              </span>
-            </span>
-          </Link>
-          <LanguageSwitcher />
+    <header className="border-b bg-card text-foreground shadow-sm">
+      <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-4">
+          <img src="/assets/logo/mark.svg" alt="বাপের টাকা" className="h-8 w-8" />
+          <span className="text-h5 font-display font-bold text-brand-800">
+            {t('brand.name')}
+          </span>
         </div>
-      </header>
+        <nav className="flex items-center gap-6">
+          <Link to="/" className="text-body text-muted-foreground hover:text-foreground transition-colors">
+            {t('foundation.title')}
+          </Link>
+          <Link to="/design-system" className="text-body text-muted-foreground hover:text-foreground transition-colors">
+            {t('nav.designSystem', 'Design System')}
+          </Link>
+          <Button variant="ghost" size="sm">
+            {t('language.bn')} / {t('language.en')}
+          </Button>
+        </nav>
+      </div>
+    </header>
+  );
+}
 
-      <main
-        id="main-content"
-        className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14"
-      >
-        <Outlet />
-      </main>
+export function Footer() {
+  const { t } = useTranslation();
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>{t('layout.footer', { year: new Date().getFullYear() })}</p>
-          <p className="inline-flex items-center gap-2">
-            <ShieldCheck aria-hidden="true" className="h-4 w-4" />
-            {t('layout.footerMeta')}
+  return (
+    <footer className="border-t bg-card text-foreground py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-small text-muted-foreground">
+            {t('layout.footer', '© {{year}} বাপের টাকা · পর্ব ০২: Dominicana & ডিজাইন সিস্টেম')}
+          </p>
+          <p className="text-small text-muted-foreground">
+            {t('layout.footerMeta', 'বাংলাদেশ · bn / en · ৳ BDT')}
           </p>
         </div>
-      </footer>
+      </div>
+    </footer>
+  );
+}
+
+export function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }
