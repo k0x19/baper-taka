@@ -266,7 +266,72 @@ renders. `dist/_redirects` is still copied by the build.
   no Cloudflare Pages deployment, and no later-phase business features — all
   unchanged and still out of scope.
 
-### 9. Next recommended step
+### 9. Final re-verification for review (2026-11-05)
+
+The review task was repeated after the CI and bundle-split commits were already
+on PR #1. This section records the remote-branch verification and a fresh local
+run. It is the only documentation-only change in this pass; no source, config
+or lockfile was altered.
+
+**9.1 Remote PR branch verification**
+
+- `git rev-parse HEAD` and
+  `git ls-remote --heads origin arena/86840354-baper-taka` both reported
+  `127b81daf22b56a72c03189f6b90d68ae21d93c5` before this entry.
+- GitHub Contents API
+  `repos/k0x19/baper-taka/contents/.github/workflows/ci.yml?ref=arena/86840354-baper-taka`
+  returned `path: .github/workflows/ci.yml`, `type: file`, `size: 751`, blob
+  `ad75bcae89b3e1068f0c31b6b90248c3db1c00c5`.
+  `git show origin/arena/86840354-baper-taka:.github/workflows/ci.yml` also
+  printed the workflow. The CI file is therefore present, committed and pushed
+  on the actual PR branch, not only in the local workspace.
+- `gh pr view 1` reported exactly one open PR: `OPEN`, base `main`, head
+  `arena/86840354-baper-taka`, `mergeable`, not merged. Local `main` remained
+  at `c080932`.
+
+**9.2 GitHub Actions runs for PR #1**
+
+- Runs created by the improvement commits: push run `41993304451` and
+  `pull_request` run `41993305499`, both `completed / success`; PR check
+  `Typecheck, lint, format, test and build` → `pass`.
+- This documentation-only commit triggers a fresh push + PR synchronize run.
+  Its run URL and the final commit SHA are recorded in PR #1's description
+  after the push (they cannot be embedded in the commit that creates them).
+
+**9.3 Fresh local validation (results observed in this pass)**
+
+| Command / check               | Result                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `npm ci --no-audit --no-fund` | passed, `added 281 packages`                                                                                       |
+| `npm run typecheck`           | passed, exit 0                                                                                                     |
+| `npm run lint`                | passed, exit 0, 0 warnings                                                                                         |
+| `npm run format`              | passed, no changes needed                                                                                          |
+| `npm run format:check`        | passed, `All matched files use Prettier code style!`                                                               |
+| `npm run test`                | passed: 7 files / 26 tests, no failures or warnings                                                                |
+| `npm run build`               | passed; measurements below                                                                                         |
+| `npm run check`               | passed: typecheck → lint → format:check → tests → build                                                            |
+| `cat dist/_redirects`         | `/* /index.html 200`                                                                                               |
+| env/secret scan               | no `.env`; only `.env.example` tracked with empty values; no credential-like values; no `secrets.*` in CI workflow |
+
+After adding this entry, `npm run format` and `npm run check` were run again
+and passed before the commit was created.
+
+**9.4 Verified production bundle measurements**
+
+| Output                                     | Size                                  |
+| ------------------------------------------ | ------------------------------------- |
+| Initial JS `index-BaaBPnlJ.js`             | 442,738 B / 442.73 kB, gzip 139.92 kB |
+| Lazy route JS `FoundationPage-C3Q4uv3F.js` | 85,441 B / 85.44 kB, gzip 24.84 kB    |
+| Total JS                                   | 528,179 B / 528.18 kB                 |
+| CSS `index-0bsr7c1d.css`                   | 16,701 B / 16.70 kB, gzip 4.41 kB     |
+| Vite >500 kB advisory                      | none                                  |
+
+Compared with the pre-split single chunk (`index-CPRz3SWb.js`, 526,745 B /
+526.74 kB, gzip 163.75 kB), the initial payload is 84,007 B / 84.01 kB
+smaller (23.83 kB smaller gzipped). No new remaining issues were introduced;
+see section 8.6.
+
+### 10. Next recommended step
 
 Await external review of the updated PR #1. Do not merge it. After approval,
 begin Phase 02 with the schema, RLS policies and privileged checkout design
