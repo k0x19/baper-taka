@@ -1,0 +1,66 @@
+{
+  "brand": {
+    "name": "বাপের টাকা",
+    "nameEn": "Baper Taka",
+    "tagline": "A dependable single-vendor e-commerce platform for Bangladesh"
+  },
+  "nav": {
+    "language": "Select language"
+  },
+  "language": {
+    "bn": "বাংলা",
+    "en": "English"
+  },
+  "foundation": {
+    "badge": "Phase 01 · Foundation & Setup",
+    "title": "The technical foundation is ready",
+    "description": "This is a temporary development page used only to verify routing, localization and rendering. It is not the finished storefront; no products, orders or payment features exist yet.",
+    "facts": {
+      "language": "Bangla (default) · English",
+      "currency": "BDT · ৳",
+      "hosting": "Cloudflare Pages · Supabase"
+    },
+    "status": {
+      "heading": "What is configured",
+      "stack": "React, Vite and strict TypeScript",
+      "styling": "Tailwind CSS, shadcn/ui base and accessible color tokens",
+      "routing": "React Router: home, loading, error and 404",
+      "i18n": "i18next: Bangla default, English secondary",
+      "data": "Supabase client, TanStack Query and Zustand",
+      "forms": "React Hook Form and Zod validation",
+      "formatting": "BDT currency, number and date formatting",
+      "testing": "Vitest and React Testing Library"
+    },
+    "planned": {
+      "heading": "Planned for later phases",
+      "catalog": "Product catalog, categories and cart",
+      "accounts": "Supabase Auth, addresses and order history",
+      "checkout": "Checkout, COD and manual bKash/Nagad verification",
+      "admin": "Admin dashboard protected by RLS"
+    },
+    "note": "No database migrations, RLS policies, authentication or payment flows have been created in this phase."
+  },
+  "config": {
+    "title": "Supabase configuration required",
+    "description": "The public environment variables below are missing or invalid. Backend features will be added in later phases. No secret values are displayed here.",
+    "variablesTitle": "Required variables",
+    "issuesTitle": "Developer messages",
+    "hint": "Set the values in a local .env file and restart the dev server (see .env.example). Set the same variables in the Cloudflare Pages build environment.",
+    "warning": "Never place a service_role or secret key in browser code or in VITE_ variables."
+  },
+  "states": {
+    "loading": "Loading…",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "This page could not be loaded. Try again or return to the home page.",
+    "retry": "Try again",
+    "goHome": "Back to home",
+    "notFoundCode": "404",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The address you are looking for has not been created yet."
+  },
+  "layout": {
+    "skipLink": "Skip to main content",
+    "footer": "© {{year}} Baper Taka · Phase 01: Foundation & Setup",
+    "footerMeta": "Bangladesh · bn / en · ৳ BDT"
+  }
+}
