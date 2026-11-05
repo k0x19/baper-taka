@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- Logo Mark -->
+  <g transform="translate(0, 10)">
+    <circle cx="40" cy="40" r="30" fill="#172554" />
+    <path d="M20 40 Q40 20 60 40 Q40 60 20 40 Z" fill="#FACC15" opacity="0.9" />
+    <path d="M30 30 L50 50 M50 30 L30 50" stroke="#0F172A" stroke-width="4" stroke-linecap="round" />
+  </g>
+  <!-- Text Lockup -->
+  <text x="85" y="55" font-family="Noto Sans Bengali, Hind Siliguri, Inter, sans-serif" font-size="36" font-weight="700" fill="#172554">বাপের টাকা</text>
+  <text x="85" y="85" font-family="Noto Sans Bengali, Hind Siliguri, Inter, sans-serif" font-size="18" font-weight="500" fill="#64748B">Baper Taka</text>
+</svg>
