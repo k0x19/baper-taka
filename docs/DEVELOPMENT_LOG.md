@@ -126,9 +126,10 @@ The production build emits one **non-fatal** Vite advisory: a chunk larger than
 
 ### 5. Known issues / outstanding items
 
-- Initial JS chunk is 526.74 kB minified (163.75 kB gzip), above Vite's 500 kB
-  advisory threshold. No route-level code splitting yet; revisit when real
-  feature routes exist rather than hiding the warning with a raised limit.
+- Initial JS chunk was 526.74 kB minified (163.75 kB gzip), above Vite's 500 kB
+  advisory threshold. **Resolved in the review follow-up (section 8):** the
+  index route is now lazy-loaded, the initial chunk is 442.73 kB, and the
+  advisory no longer appears. No warning limit was raised or suppressed.
 - No live Supabase project URL/key was available or requested, so **no
   real backend, Auth, RLS or network integration test was run**. Env validation
   and client creation were tested with stubbed values only.
@@ -153,8 +154,120 @@ Optional in Phase 01: the app shows a safe configuration notice when both are
 absent. Never add `service_role`, secret keys or database passwords to `VITE_`
 variables; `.env` is git-ignored.
 
-### 8. Next recommended step
+### 8. Review follow-up improvements (2026-11-05)
 
-Await external review of the Phase 01 PR. Do not merge it. After approval,
+The preliminary review of PR #1 requested CI and a bundle-size investigation.
+Both were addressed on the same branch; no second PR was opened and `main` was
+not changed.
+
+**8.1 GitHub Actions CI — `.github/workflows/ci.yml` (created)**
+
+- Triggers: `pull_request` targeting `main`; `push` to `main` and to the active
+  development branch `arena/86840354-baper-taka`. No deployment workflow.
+- `permissions: contents: read` at workflow level; `actions/checkout@v4` with
+  `persist-credentials: false`; no `secrets.*` references and no environment
+  credentials. The app's missing-env path is exercised in CI on purpose.
+- `actions/setup-node@v4` with `node-version: '22'` (satisfies the project
+  `>=22.12.0` engine requirement) and `cache: npm` keyed on the committed
+  `package-lock.json`.
+- Steps: `npm ci` → `npm run check` (typecheck → lint → format:check → tests →
+  build), with `CI: true`. `timeout-minutes: 15`.
+- CI does not require `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`;
+  no real Supabase connection is attempted.
+
+**8.2 Bundle investigation**
+
+Method: a **temporary, uncommitted** `vite build` config with an inline
+`generateBundle` plugin read Rolldown's per-module `renderedLength` values and
+grouped them by package. No analysis dependency was added and the config was
+deleted after use. Rendered lengths are pre-minification module contributions,
+so their sum exceeds the final chunk size; the relative shares are the useful
+signal. Rolldown's `output.code.length` counts UTF-16 code units, so it differs
+slightly from the UTF-8 file sizes Vite reports; Vite byte sizes are used for
+all before/after comparisons below.
+
+Before the change, the single initial JS chunk (Vite file size 526,745 bytes;
+`output.code.length` 524,297 code units) contained these largest groups:
+
+| Package                | Rendered bytes | Observation                                                         |
+| ---------------------- | -------------- | ------------------------------------------------------------------- |
+| `react-dom`            | 536,687        | Essential React runtime; cannot be removed from the shell           |
+| `react-router`         | 210,200        | Essential data router                                               |
+| `zod`                  | 146,279        | **Only reachable through `ConfigurationNotice` → `FoundationPage`** |
+| `i18next`              | 84,234         | Essential Bangla/English initialization                             |
+| `tailwind-merge`       | 56,652         | Used by the shell's `Button`/`cn` helper                            |
+| `@tanstack/query-core` | 47,876         | Essential provider                                                  |
+| app source             | 25,659         | Small                                                               |
+
+The key finding: Zod-based env validation and the configuration notice were
+being pulled into the initial shell solely by the temporary landing page.
+
+**8.3 Change made — route-level code splitting**
+
+- `src/app/lazy-foundation-page.tsx` exports the `React.lazy(() => import(...))`
+  wrapper; `src/app/router.tsx` renders it on the index route. Isolating the
+  wrapper keeps the router file free of mixed component/non-component exports
+  (no ESLint suppression).
+- The existing `<Suspense fallback={<PageLoader />}>` in `src/app/App.tsx`
+  handles the lazy boundary; no new loading UI was added.
+- `RootLayout`, `RouteErrorPage` and `NotFoundPage` remain **static**: the app
+  shell, error boundary and 404 route are always available immediately.
+- `tests/unit/app.test.tsx` now awaits the lazy index route and explicitly
+  verifies the unknown-path 404 route still works. Other tests unchanged.
+- No new dependencies, no `chunkSizeWarningLimit` change, no suppressed
+  warning, no changed routes.
+
+After the change, the analysis showed `zod` (146,249 rendered bytes) and the
+configuration-notice app code moved entirely into the async
+`FoundationPage` chunk; the initial chunk contains only shell/runtime code.
+
+**8.4 Measured before / after (Vite 8.3.6, `npm run build`)**
+
+|                       | Before                                                          | After                                                                 |
+| --------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Initial JS            | `index-CPRz3SWb.js` — 526,745 bytes / 526.74 kB, gzip 163.75 kB | `index-BaaBPnlJ.js` — 442,738 bytes / 442.73 kB, gzip 139.92 kB       |
+| Lazy route JS         | none                                                            | `FoundationPage-C3Q4uv3F.js` — 85,441 bytes / 85.44 kB, gzip 24.84 kB |
+| Total JS              | 526,745 bytes                                                   | 528,179 bytes (+1,434 bytes / +1.44 kB chunk overhead)                |
+| CSS                   | 16.62 kB (gzip 4.39 kB)                                         | 16.70 kB (gzip 4.41 kB)                                               |
+| Vite >500 kB advisory | present                                                         | **gone**                                                              |
+
+Initial payload reduced by **84,007 bytes / 84.01 kB minified** (~15.9%) and
+**23.83 kB gzip**. Total JS grew slightly (+1.44 kB) because of chunk
+boilerplate, but the deferred 85.44 kB is only fetched when the index route
+renders. `dist/_redirects` is still copied by the build.
+
+**8.5 Follow-up validation (actual results)**
+
+| Command                       | Result                                                                                                                                              |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm ci --no-audit --no-fund` | passed, `added 281 packages`                                                                                                                        |
+| `npm run typecheck`           | passed (`tsc --noEmit`), exit 0                                                                                                                     |
+| `npm run lint`                | passed (`eslint .`), exit 0, **0 warnings** (a transient `react-refresh` warning in the first router draft was fixed by isolating the lazy wrapper) |
+| `npm run format`              | passed; workflow, router, tests and docs formatted                                                                                                  |
+| `npm run format:check`        | passed, `All matched files use Prettier code style!`                                                                                                |
+| `npm run test`                | passed: 7 files / 26 tests (one new 404-route test), no warnings                                                                                    |
+| `npm run build`               | passed; sizes above; no chunk-size advisory                                                                                                         |
+| `npm run check`               | passed: typecheck → lint → format:check → tests → build                                                                                             |
+| `cat dist/_redirects`         | `/* /index.html 200`                                                                                                                                |
+| secret/env scan               | no `.env`, no `service_role`/secret key values, only `.env.example` tracked                                                                         |
+
+**8.6 Remaining issues after the follow-up**
+
+- `react-dom` + `react-router` still dominate the initial shell; further
+  vendor splitting would only redistribute bytes that are all needed on first
+  paint, so it was not done.
+- The total JS is ~1.44 kB larger due to the extra chunk; this is expected and
+  is outweighed by the smaller initial payload. CSS is 16.70 kB (0.08 kB above
+  the pre-follow-up build); Tailwind v4 scans project text files by default,
+  so the new CI/docs files account for the small change.
+- The lazy route adds one additional network request for the index page; it is
+  covered by the existing Suspense loading fallback.
+- No live Supabase credentials, no real backend/RLS tests, no Playwright/E2E,
+  no Cloudflare Pages deployment, and no later-phase business features — all
+  unchanged and still out of scope.
+
+### 9. Next recommended step
+
+Await external review of the updated PR #1. Do not merge it. After approval,
 begin Phase 02 with the schema, RLS policies and privileged checkout design
 documented in `docs/DATABASE_SCHEMA.md` and `docs/SECURITY_POLICY.md`.

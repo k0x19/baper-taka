@@ -89,6 +89,14 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 | `npm run test:watch`   | Vitest watch mode                                        |
 | `npm run check`        | typecheck → lint → prettier → tests → build              |
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs `npm ci` and `npm run check` on Node.js 22 for
+pull requests targeting `main` and pushes to the development branch. It uses
+read-only repository permissions, npm dependency caching and no secrets. CI
+does not need Supabase credentials because the app handles missing public env
+variables gracefully. There is no deployment workflow.
+
 ## Cloudflare Pages configuration
 
 | Setting                | Value                                                                     |
